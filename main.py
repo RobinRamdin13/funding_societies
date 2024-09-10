@@ -112,6 +112,26 @@ def split_date(text:str) -> Tuple[str, str]:
     split = text.split('-')
     return split[0], split[1]
 
+def get_bar_plots(df:DataFrame, cat_cols:List, plot_path:str, name:str)->None: 
+    fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(17,12))
+    for idx, col in enumerate(cat_cols):
+        df[col].value_counts().plot.barh(ax=axes[idx//3, idx%3])
+        axes[idx//3, idx%3].set_xlabel('Count', **axis_params)
+        axes[idx//3, idx%3].set_ylabel(col, **axis_params)
+        axes[idx//3, idx%3].grid()
+    fig.suptitle('Categorical Field Distribution', **title_params)
+    plt.tight_layout()
+    fig.savefig(join(plot_path, f'{name}.jpeg'))
+    plt.close()
+    return
+
+def get_heatmap(df:DataFrame, plot_path:str, name:str)->None:
+    corr = df.corr()
+    sns.heatmap(corr, annot=True)
+    plt.savefig(join(plot_path, f'{name}.jpeg'))
+    plt.close()
+    return
+
 
 def main(data_path:str, plot_path:str)-> None: 
     # load the csv file into Dataframe 
@@ -131,8 +151,12 @@ def main(data_path:str, plot_path:str)-> None:
 
     # split the issue date into months and years
     df['issue_month'], df['issue_year'] = zip(*df['issue_d'].map(split_date))
-    df.drop(columns=['issue_d'], inplace=True)
-    cat_cols = [f for f in cols if f not in num_cols] # instantiate the categorical columns 
+    df.drop(columns=['issue_d', 'emp_title'], inplace=True)
+    cat_cols = [f for f in df.columns.tolist() if f not in num_cols] # instantiate the categorical columns 
+
+    get_bar_plots(df, cat_cols, plot_path, name='init_bar')
+
+    get_heatmap(df[num_cols], plot_path, name='heat_map')
     return
 
 if __name__ == '__main__':
