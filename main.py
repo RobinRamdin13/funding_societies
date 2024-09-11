@@ -228,10 +228,9 @@ def main(data_path:str, plot_path:str)-> None:
     df.drop(columns=['issue_d', 'emp_title'], inplace=True)
     cat_cols = [f for f in df.columns.tolist() if f not in num_cols] # instantiate the categorical columns 
 
+    # generate the plots
     get_bar_plots(df, cat_cols, plot_path, name='init_bar')
-
     get_heatmap(df[num_cols], plot_path, name='heat_map')
-
     get_chi_square(df, cat_cols, plot_path, name='chi_square_heatmap')
 
     # reset the index and impute missing values
