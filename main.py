@@ -4,9 +4,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt 
 
 from tqdm import tqdm
+from pandas import DataFrame
 from typing import List, Tuple
-from pandas import DataFrame, Series
 from os.path import isdir, join
+from scipy.stats import chi2_contingency
 
 # instantiate the global variables
 # dict to map the columns to descriptions
@@ -140,6 +141,32 @@ def get_heatmap(df:DataFrame, plot_path:str, name:str)->None:
     plt.close()
     return
 
+def get_chi_square(df:DataFrame, cat_cols:List, plot_path:str, name:str)->None:
+    """Function to compute the chi-square test between each pair of categorical 
+    variables 
+
+    Args:
+        df (DataFrame): dataset
+        cat_cols (List): categorical column list
+        plot_path (str): path for plot folder
+        name (str): plot name
+    """    
+    chi_dict = {}
+    for i in range(len(cat_cols)-1):
+        chi_dict[cat_cols[i]] = {}
+        for j in range(i+1, len(cat_cols)):
+            cont_table = pd.crosstab(df[cat_cols[i]], df[cat_cols[j]])
+            _, p, _, _ = chi2_contingency(cont_table)
+            chi_dict[f'{cat_cols[i]}'][f'{cat_cols[j]}'] = float(p)
+    df_chi = pd.DataFrame.from_dict(chi_dict)
+    fig = plt.figure(figsize=(10,10))
+    sns.heatmap(df_chi, annot=True)
+    plt.tight_layout()
+    fig.suptitle('Categorical Fields Correlation Matrix', **title_params)
+    plt.savefig(join(plot_path, f'{name}.jpeg'))
+    plt.close()
+    return
+
 
 def main(data_path:str, plot_path:str)-> None: 
     # load the csv file into Dataframe 
@@ -165,6 +192,8 @@ def main(data_path:str, plot_path:str)-> None:
     get_bar_plots(df, cat_cols, plot_path, name='init_bar')
 
     get_heatmap(df[num_cols], plot_path, name='heat_map')
+
+    get_chi_square(df, cat_cols, plot_path, name='chi_square_heatmap')
     return
 
 if __name__ == '__main__':
