@@ -126,8 +126,16 @@ def get_bar_plots(df:DataFrame, cat_cols:List, plot_path:str, name:str)->None:
     return
 
 def get_heatmap(df:DataFrame, plot_path:str, name:str)->None:
+    """Function to generate heatmap of correlation between numerical fields
+
+    Args:
+        df (DataFrame): dataset
+        plot_path (str): path for plot folder
+        name (str): plot name
+    """    
     corr = df.corr()
     sns.heatmap(corr, annot=True)
+    plt.title('Numerical Fields Correlation Matrix', **title_params)
     plt.savefig(join(plot_path, f'{name}.jpeg'))
     plt.close()
     return
