@@ -1,3 +1,4 @@
+import re
 import os 
 import pandas as pd 
 import seaborn as sns
@@ -159,6 +160,14 @@ def get_chi_square(df:DataFrame, cat_cols:List, plot_path:str, name:str)->None:
     plt.close()
     return
 
+def get_imputation(df:DataFrame)->DataFrame:
+    #  instantiate the miceforest imputer 
+    kds = mf.ImputationKernel(data=df, random_state=random_state)
+    # run the miceforest imputer
+    kds.mice(iterations=5)
+    df_imp = kds.complete_data()
+    return df_imp
+
 
 def main(data_path:str, plot_path:str)-> None: 
     # load the csv file into Dataframe 
@@ -198,6 +207,12 @@ def main(data_path:str, plot_path:str)-> None:
         df = df.replace({'grade':grade_encoder, 'issue_month':month_encoder,
                          'issue_year':year_encoder, 'emp_length':emp_encoder}).infer_objects(copy=False) # encode ordinal values
     
+    # modify the field names for imputation
+    df.columns = df.columns.str.replace('[\s]', '', regex=True).str.replace('[.:()-]', '_', regex=True)
+    
+    # # perform data imputation
+    df = get_imputation(df)
+
     return
 
 if __name__ == '__main__':
