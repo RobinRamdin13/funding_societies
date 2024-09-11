@@ -41,6 +41,14 @@ def missing_data(df:DataFrame, plot_path:str)->None:
     return
 
 def plot_desc_stats(df:DataFrame, num_cols:List, plot_path:str, name:str)->None:
+    """Function to plot numerical summary statistics
+
+    Args:
+        df (DataFrame): dataset
+        num_cols (List): numerical columns
+        plot_path (str): path for plot folder
+        name (str): plot name
+    """    
     # instantiate the descriptive statistitcs
     df_desc = df.describe()
     df_desc.drop(['count'], axis=0, inplace=True)
@@ -69,6 +77,14 @@ def remove_noise(df:DataFrame)-> DataFrame:
     return df
 
 def get_boxplots(df:DataFrame, num_cols:List, plot_path:str, name:str)->None:
+    """Function to generate the box plots for numerical fields
+
+    Args:
+        df (DataFrame): dataset
+        num_cols (List): numerical columns
+        plot_path (str): path for plot folder
+        name (str): plot name
+    """    
     fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(15,10))
     for idx, col in enumerate(num_cols):
         df.plot.box(column = col, ax=axes[idx])
@@ -107,6 +123,14 @@ def split_date(text:str) -> Tuple[str, str]:
     return split[0], split[1]
 
 def get_bar_plots(df:DataFrame, cat_cols:List, plot_path:str, name:str)->None: 
+    """Function to generate the bar plots
+
+    Args:
+        df (DataFrame): dataset
+        cat_cols (List): categorical columns
+        plot_path (str): path for plot folder
+        name (str): plot name
+    """    
     fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(17,12))
     for idx, col in enumerate(cat_cols):
         df[col].value_counts().plot.barh(ax=axes[idx//3, idx%3])
@@ -161,6 +185,14 @@ def get_chi_square(df:DataFrame, cat_cols:List, plot_path:str, name:str)->None:
     return
 
 def get_imputation(df:DataFrame)->DataFrame:
+    """Function to perform imputation on dataset
+
+    Args:
+        df (DataFrame): dataset
+
+    Returns:
+        DataFrame: imputed dataset
+    """    
     #  instantiate the miceforest imputer 
     kds = mf.ImputationKernel(data=df, random_state=random_state)
     # run the miceforest imputer
@@ -170,6 +202,12 @@ def get_imputation(df:DataFrame)->DataFrame:
 
 
 def main(data_path:str, plot_path:str)-> None: 
+    """Function to run the main logic
+
+    Args:
+        data_path (str): path for data folder
+        plot_path (str): path for plot folder
+    """    
     # load the csv file into Dataframe 
     df = pd.read_csv(data_path, index_col=0)
 
@@ -212,6 +250,7 @@ def main(data_path:str, plot_path:str)-> None:
     
     # # perform data imputation
     df = get_imputation(df)
+    df.to_csv(join(data_path,'processed.csv'))
 
     return
 
