@@ -1,31 +1,23 @@
 import os 
 import pandas as pd 
 import seaborn as sns
+import miceforest as mf
 import matplotlib.pyplot as plt 
 
-from tqdm import tqdm
 from pandas import DataFrame
 from typing import List, Tuple
 from os.path import isdir, join
 from scipy.stats import chi2_contingency
 
-# instantiate the global variables
-# dict to map the columns to descriptions
-cols_map = {'loan_amnt': 'Loan Amount',
-            'term': "Loan Term",
-            'int_rate': 'Interest Rate',
-            'dti': 'Debt-to-Income',
-            'grade': 'Grade',
-            'annual_inc': 'Annual Income',
-            'home_ownership': 'Home Onwership',
-            'pymnt_plan': 'Payment Plant',
-            'purpose': 'Loan Purpose',
-            'emp_title': 'Employment Title',
-            'issue_d': 'Loan Issue Date',
-            'loan_status': 'Loan Status',
-            'emp_length': 'Employment Length'}
 title_params = {'fontweight':'bold', 'fontsize':14}
+month_encoder = {'Dec':12, 'Nov':11, 'Oct':10, 'Sep':9, 'Aug':8, 'Jul':7, 'Jun':6, 'May':5, 'Apr':4, 
+                 'Mar':3, 'Feb':2, 'Jan':1}
+grade_encoder = {'B':2, 'C':3, 'A':1, 'E':5, 'F':6, 'D':4, 'G':7}
+emp_encoder = {'10+ years':11, '< 1 year':1, '1 year':2, '3 years':4, '8 years':9, '9 years':10, 
+               '4 years':5,'5 years':6, '6 years':7, '2 years':3, '7 years':8}
+year_encoder = {'2011':5, '2010':4, '2009':3, '2008':2, '2007':1, '2013':7, '2012':6, '2014':8, '2015':9}
 axis_params = {'fontsize':12}
+random_state = 12345
 
 def missing_data(df:DataFrame, plot_path:str)->None: 
     """Function to compute the missing data in dataset
@@ -194,6 +186,18 @@ def main(data_path:str, plot_path:str)-> None:
     get_heatmap(df[num_cols], plot_path, name='heat_map')
 
     get_chi_square(df, cat_cols, plot_path, name='chi_square_heatmap')
+
+    # reset the index and impute missing values
+    df.reset_index(drop=True, inplace=True)
+
+    # encode the dataset to numerical values 
+    ordinal_list = ['issue_month', 'issue_year', 'emp_length', 'grade']
+    nominal_list = [f for f in cat_cols if f not in ordinal_list]
+    df = pd.get_dummies(df, columns=nominal_list, drop_first=True, dtype=int) # one hot encode nominal values
+    with pd.option_context("future.no_silent_downcasting", True):
+        df = df.replace({'grade':grade_encoder, 'issue_month':month_encoder,
+                         'issue_year':year_encoder, 'emp_length':emp_encoder}).infer_objects(copy=False) # encode ordinal values
+    
     return
 
 if __name__ == '__main__':
