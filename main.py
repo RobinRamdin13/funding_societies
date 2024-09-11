@@ -201,11 +201,12 @@ def get_imputation(df:DataFrame)->DataFrame:
     return df_imp
 
 
-def main(data_path:str, plot_path:str)-> None: 
+def main(data_path:str, data_folder:str, plot_path:str)-> None: 
     """Function to run the main logic
 
     Args:
-        data_path (str): path for data folder
+        data_path (str): path for data file
+        data_folder (str): path for data folder
         plot_path (str): path for plot folder
     """    
     # load the csv file into Dataframe 
@@ -249,13 +250,13 @@ def main(data_path:str, plot_path:str)-> None:
     
     # # perform data imputation
     df = get_imputation(df)
-    df.to_csv(join(data_path,'processed.csv'))
-
+    df.to_csv(join(data_folder,'processed.csv'))
     return
 
 if __name__ == '__main__':
     cwd = os.getcwd() # get the current working directory
-    data_path = join(cwd, join('data', 'loans_fs.csv')) # get the file path
+    data_folder = join(cwd, 'data') # get the data folder path
+    data_path = join(data_folder, 'loans_fs.csv') # get the file path
     plot_path = join(cwd, 'plots') # create the plot path
     if not isdir(plot_path): os.mkdir(plot_path) # create the folder
-    main(data_path, plot_path)
+    main(data_path, data_folder, plot_path)
