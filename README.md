@@ -13,3 +13,6 @@ After creating the virtual environment, run the following command, this will dow
 
 #### Executing main.py
 To run the main file run the following command within your terminal `python main.py`.
+
+#### Executing hypothesis.py
+To run the hypothesis file run the following command within your terminal `python hypothesis.py`.
