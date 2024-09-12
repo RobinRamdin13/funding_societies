@@ -10,6 +10,15 @@ title_params = {'fontweight':'bold', 'fontsize':14}
 axis_params = {'fontsize':12}
 
 def scatter_plot(df:DataFrame, x:str, y:str, plot_path:str, name:str)->None:
+    """Function to generate the jointplot between two fields
+
+    Args:
+        df (DataFrame): dataset
+        x (str): x-variable
+        y (str): y-variable
+        plot_path (str): path for plot folder
+        name (str): plot name
+    """    
     fig = plt.figure(figsize=(7,7))
     sns.jointplot(x=x, y=y, data=df)
     plt.xlabel(x, **axis_params)
@@ -22,6 +31,12 @@ def scatter_plot(df:DataFrame, x:str, y:str, plot_path:str, name:str)->None:
     return
 
 def main(data_path:str, plot_path:str)->None: 
+    """Function to run the main logic
+
+    Args:
+        data_path (str): path for data file
+        plot_path (str): path for plot folder
+    """    
     # load processed dataset
     df = pd.read_csv(data_path, index_col=0)
     
